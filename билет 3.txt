@@ -1,0 +1,27 @@
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем объекты разных транспортных средств
+        Car car = new Car("Toyota Camry", 8.5, 60);
+        Bike bike = new Bike("Giant Escape", 0); // У велосипеда расход топлива 0
+        Bus bus = new Bus("Mercedes-Benz Citaro", 25, 200);
+
+        // Выводим информацию о транспортных средствах
+        car.DisplayInfo();
+        Console.WriteLine($"Расход топлива на 100 км: {car.CalculateFuelConsumption(100)} литров\n");
+
+        bike.DisplayInfo();
+        Console.WriteLine($"Расход топлива на 100 км: {bike.CalculateFuelConsumption(100)} литров\n");
+
+        bus.DisplayInfo();
+        Console.WriteLine($"Расход топлива на 100 км: {bus.CalculateFuelConsumption(100)} литров\n");
+    }
+}
+
+// Базовый класс Transport
+abstract class Transport
+{
+    public string Name {

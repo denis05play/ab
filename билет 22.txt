@@ -1,0 +1,86 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем граф
+        var graph = new Graph();
+
+        // Добавляем вершины
+        graph.AddVertex(1);
+        graph.AddVertex(2);
+        graph.AddVertex(3);
+        graph.AddVertex(4);
+        graph.AddVertex(5);
+
+        // Добавляем ребра
+        graph.AddEdge(1, 2);
+        graph.AddEdge(1, 3);
+        graph.AddEdge(2, 4);
+        graph.AddEdge(3, 4);
+        graph.AddEdge(4, 5);
+
+        // Выполняем поиск в глубину (DFS)
+        Console.WriteLine("Поиск в глубину (DFS), начиная с вершины 1:");
+        graph.DFS(1);
+    }
+}
+
+// Класс для представления графа
+class Graph
+{
+    // Список смежности для хранения графа
+    private readonly Dictionary<int, List<int>> _adjacencyList;
+
+    public Graph()
+    {
+        _adjacencyList = new Dictionary<int, List<int>>();
+    }
+
+    // Метод для добавления вершины
+    public void AddVertex(int vertex)
+    {
+        if (!_adjacencyList.ContainsKey(vertex))
+        {
+            _adjacencyList[vertex] = new List<int>();
+        }
+    }
+
+    // Метод для добавления ребра (неориентированный граф)
+    public void AddEdge(int vertex1, int vertex2)
+    {
+        if (!_adjacencyList.ContainsKey(vertex1) || !_adjacencyList.ContainsKey(vertex2))
+        {
+            throw new InvalidOperationException("Одна из вершин не существует.");
+        }
+
+        _adjacencyList[vertex1].Add(vertex2);
+        _adjacencyList[vertex2].Add(vertex1);
+    }
+
+    // Метод для поиска в глубину (DFS)
+    public void DFS(int startVertex)
+    {
+        var visited = new HashSet<int>();
+        DFSUtil(startVertex, visited);
+    }
+
+    // Вспомогательный метод для рекурсивного поиска в глубину
+    private void DFSUtil(int vertex, HashSet<int> visited)
+    {
+        // Помечаем вершину как посещенную
+        visited.Add(vertex);
+        Console.WriteLine($"Посещена вершина: {vertex}");
+
+        // Рекурсивно посещаем все смежные вершины
+        foreach (var neighbor in _adjacencyList[vertex])
+        {
+            if (!visited.Contains(neighbor))
+            {
+                DFSUtil(neighbor, visited);
+            }
+        }
+    }
+}

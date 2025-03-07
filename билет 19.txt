@@ -1,0 +1,145 @@
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Исходный массив для сортировки
+        int[] array = { 5, 3, 8, 4, 2, 7, 1, 6 };
+
+        Console.WriteLine("Исходный массив:");
+        PrintArray(array);
+
+        // Выбор алгоритма сортировки
+        Console.WriteLine("\nВыберите алгоритм сортировки:");
+        Console.WriteLine("1. Пузырьковая сортировка");
+        Console.WriteLine("2. Быстрая сортировка");
+        Console.Write("Ваш выбор: ");
+        string choice = Console.ReadLine();
+
+        // Создаем контекст сортировки
+        var context = new SortContext();
+
+        // Устанавливаем стратегию в зависимости от выбора пользователя
+        switch (choice)
+        {
+            case "1":
+                context.SetStrategy(new BubbleSortStrategy());
+                break;
+            case "2":
+                context.SetStrategy(new QuickSortStrategy());
+                break;
+            default:
+                Console.WriteLine("Неверный выбор. Используется пузырьковая сортировка по умолчанию.");
+                context.SetStrategy(new BubbleSortStrategy());
+                break;
+        }
+
+        // Выполняем сортировку
+        context.ExecuteSort(array);
+
+        // Выводим отсортированный массив
+        Console.WriteLine("\nОтсортированный массив:");
+        PrintArray(array);
+    }
+
+    // Метод для вывода массива на экран
+    static void PrintArray(int[] array)
+    {
+        foreach (var item in array)
+        {
+            Console.Write($"{item} ");
+        }
+        Console.WriteLine();
+    }
+}
+
+// Интерфейс стратегии сортировки
+interface ISortStrategy
+{
+    void Sort(int[] array);
+}
+
+// Реализация пузырьковой сортировки
+class BubbleSortStrategy : ISortStrategy
+{
+    public void Sort(int[] array)
+    {
+        int n = array.Length;
+        for (int i = 0; i < n - 1; i++)
+        {
+            for (int j = 0; j < n - i - 1; j++)
+            {
+                if (array[j] > array[j + 1])
+                {
+                    // Меняем элементы местами
+                    int temp = array[j];
+                    array[j] = array[j + 1];
+                    array[j + 1] = temp;
+                }
+            }
+        }
+    }
+}
+
+// Реализация быстрой сортировки
+class QuickSortStrategy : ISortStrategy
+{
+    public void Sort(int[] array)
+    {
+        QuickSort(array, 0, array.Length - 1);
+    }
+
+    private void QuickSort(int[] array, int low, int high)
+    {
+        if (low < high)
+        {
+            int pi = Partition(array, low, high);
+            QuickSort(array, low, pi - 1);
+            QuickSort(array, pi + 1, high);
+        }
+    }
+
+    private int Partition(int[] array, int low, int high)
+    {
+        int pivot = array[high];
+        int i = low - 1;
+
+        for (int j = low; j < high; j++)
+        {
+            if (array[j] < pivot)
+            {
+                i++;
+                // Меняем элементы местами
+                int temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        // Меняем элементы местами
+        int temp1 = array[i + 1];
+        array[i + 1] = array[high];
+        array[high] = temp1;
+
+        return i + 1;
+    }
+}
+
+// Контекст сортировки
+class SortContext
+{
+    private ISortStrategy _strategy;
+
+    // Устанавливаем стратегию
+    public void SetStrategy(ISortStrategy strategy)
+    {
+        _strategy = strategy;
+    }
+
+    // Выполняем сортировку
+    public void ExecuteSort(int[] array)
+    {
+        _strategy.Sort(array);
+    }
+}

@@ -1,0 +1,58 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем коллекцию объектов Person
+        List<Person> people = new List<Person>
+        {
+            new Person { Name = "Иван", Age = 25, City = "Москва" },
+            new Person { Name = "Мария", Age = 30, City = "Санкт-Петербург" },
+            new Person { Name = "Алексей", Age = 20, City = "Москва" },
+            new Person { Name = "Ольга", Age = 35, City = "Казань" },
+            new Person { Name = "Дмитрий", Age = 40, City = "Санкт-Петербург" },
+            new Person { Name = "Елена", Age = 22, City = "Москва" }
+        };
+
+        // 1. Фильтрация людей по возрасту (например, старше 25 лет)
+        var filteredByAge = people.Where(p => p.Age > 25);
+        Console.WriteLine("Люди старше 25 лет:");
+        foreach (var person in filteredByAge)
+        {
+            Console.WriteLine($"{person.Name}, {person.Age} лет, {person.City}");
+        }
+        Console.WriteLine();
+
+        // 2. Фильтрация людей по городу (например, Москва)
+        var filteredByCity = people.Where(p => p.City == "Москва");
+        Console.WriteLine("Люди из Москвы:");
+        foreach (var person in filteredByCity)
+        {
+            Console.WriteLine($"{person.Name}, {person.Age} лет, {person.City}");
+        }
+        Console.WriteLine();
+
+        // 3. Группировка людей по городу
+        var groupedByCity = people.GroupBy(p => p.City);
+        Console.WriteLine("Группировка по городу:");
+        foreach (var group in groupedByCity)
+        {
+            Console.WriteLine($"Город: {group.Key}");
+            foreach (var person in group)
+            {
+                Console.WriteLine($"  {person.Name}, {person.Age} лет");
+            }
+        }
+    }
+}
+
+// Класс Person
+class Person
+{
+    public string Name { get; set; } // Имя
+    public int Age { get; set; }     // Возраст
+    public string City { get; set; } // Город
+}

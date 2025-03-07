@@ -1,0 +1,54 @@
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        // Создаем объект будильника
+        Alarm alarm = new Alarm();
+
+        // Подписываемся на событие
+        alarm.AlarmTriggered += OnAlarmTriggered;
+
+        // Устанавливаем время срабатывания будильника (через 5 секунд)
+        DateTime alarmTime = DateTime.Now.AddSeconds(5);
+        alarm.SetAlarm(alarmTime);
+
+        Console.WriteLine($"Будильник установлен на {alarmTime:T}");
+
+        // Ожидаем срабатывания будильника
+        await Task.Delay(6000); // Ждем 6 секунд, чтобы программа не завершилась раньше времени
+    }
+
+    // Метод-обработчик события
+    static void OnAlarmTriggered(object sender, EventArgs e)
+    {
+        Console.WriteLine("Будильник сработал! Время вставать!");
+    }
+}
+
+// Класс Alarm
+class Alarm
+{
+    // Событие, которое срабатывает при достижении заданного времени
+    public event EventHandler AlarmTriggered;
+
+    // Метод для установки будильника
+    public void SetAlarm(DateTime alarmTime)
+    {
+        // Запускаем асинхронную задачу для отслеживания времени
+        Task.Run(() =>
+        {
+            while (DateTime.Now < alarmTime)
+            {
+                // Ждем 1 секунду перед следующей проверкой
+                Thread.Sleep(1000);
+            }
+
+            // Когда время наступило, вызываем событие
+            AlarmTriggered?.Invoke(this, EventArgs.Empty);
+        });
+    }
+}

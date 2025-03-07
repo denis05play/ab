@@ -1,0 +1,79 @@
+using System;
+using System.IO;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Укажите путь к исходному файлу
+        string inputFilePath = "input.txt";
+        // Укажите путь к файлу для сохранения результатов
+        string outputFilePath = "output.txt";
+
+        // Проверяем, существует ли исходный файл
+        if (!File.Exists(inputFilePath))
+        {
+            Console.WriteLine("Исходный файл не найден.");
+            return;
+        }
+
+        // Чтение содержимого файла
+        string text = File.ReadAllText(inputFilePath);
+
+        // Подсчет количества слов, предложений и абзацев
+        int wordCount = CountWords(text);
+        int sentenceCount = CountSentences(text);
+        int paragraphCount = CountParagraphs(text);
+
+        // Вывод результатов в консоль
+        Console.WriteLine($"Количество слов: {wordCount}");
+        Console.WriteLine($"Количество предложений: {sentenceCount}");
+        Console.WriteLine($"Количество абзацев: {paragraphCount}");
+
+        // Сохранение результатов в новый файл
+        string result = $"Количество слов: {wordCount}\n" +
+                        $"Количество предложений: {sentenceCount}\n" +
+                        $"Количество абзацев: {paragraphCount}";
+
+        File.WriteAllText(outputFilePath, result);
+        Console.WriteLine($"Результаты сохранены в файл: {outputFilePath}");
+    }
+
+    // Метод для подсчета слов
+    static int CountWords(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return 0;
+
+        // Разделяем текст на слова по пробелам и символам пунктуации
+        string[] words = text.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        return words.Length;
+    }
+
+    // Метод для подсчета предложений
+    static int CountSentences(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return 0;
+
+        // Подсчитываем предложения по точкам, восклицательным и вопросительным знакам
+        int count = 0;
+        foreach (char c in text)
+        {
+            if (c == '.' || c == '!' || c == '?')
+                count++;
+        }
+        return count;
+    }
+
+    // Метод для подсчета абзацев
+    static int CountParagraphs(string text)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+            return 0;
+
+        // Разделяем текст на абзацы по символам новой строки
+        string[] paragraphs = text.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        return paragraphs.Length;
+    }
+}

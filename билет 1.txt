@@ -1,0 +1,145 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        Library library = new Library();
+
+        while (true)
+        {
+            Console.WriteLine("1. Добавить книгу");
+            Console.WriteLine("2. Удалить книгу");
+            Console.WriteLine("3. Найти книгу по названию");
+            Console.WriteLine("4. Найти книгу по автору");
+            Console.WriteLine("5. Показать все книги");
+            Console.WriteLine("6. Выйти");
+            Console.Write("Выберите действие: ");
+
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Введите название книги: ");
+                    string title = Console.ReadLine();
+                    Console.Write("Введите автора книги: ");
+                    string author = Console.ReadLine();
+                    library.AddBook(title, author);
+                    break;
+
+                case "2":
+                    Console.Write("Введите название книги для удаления: ");
+                    string titleToRemove = Console.ReadLine();
+                    library.RemoveBook(titleToRemove);
+                    break;
+
+                case "3":
+                    Console.Write("Введите название книги для поиска: ");
+                    string titleToFind = Console.ReadLine();
+                    library.FindBookByTitle(titleToFind);
+                    break;
+
+                case "4":
+                    Console.Write("Введите автора книги для поиска: ");
+                    string authorToFind = Console.ReadLine();
+                    library.FindBookByAuthor(authorToFind);
+                    break;
+
+                case "5":
+                    library.ShowAllBooks();
+                    break;
+
+                case "6":
+                    return;
+
+                default:
+                    Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                    break;
+            }
+        }
+    }
+}
+
+class Library
+{
+    private List<Book> books = new List<Book>();
+
+    public void AddBook(string title, string author)
+    {
+        books.Add(new Book { Title = title, Author = author });
+        Console.WriteLine("Книга добавлена.");
+    }
+
+    public void RemoveBook(string title)
+    {
+        Book bookToRemove = books.FirstOrDefault(b => b.Title.Equals(title, StringComparison.OrdinalIgnoreCase));
+        if (bookToRemove != null)
+        {
+            books.Remove(bookToRemove);
+            Console.WriteLine("Книга удалена.");
+        }
+        else
+        {
+            Console.WriteLine("Книга не найдена.");
+        }
+    }
+
+    public void FindBookByTitle(string title)
+    {
+        var foundBooks = books.Where(b => b.Title.Contains(title, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (foundBooks.Any())
+        {
+            Console.WriteLine("Найденные книги:");
+            foreach (var book in foundBooks)
+            {
+                Console.WriteLine($"{book.Title} - {book.Author}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Книги не найдены.");
+        }
+    }
+
+    public void FindBookByAuthor(string author)
+    {
+        var foundBooks = books.Where(b => b.Author.Contains(author, StringComparison.OrdinalIgnoreCase)).ToList();
+        if (foundBooks.Any())
+        {
+            Console.WriteLine("Найденные книги:");
+            foreach (var book in foundBooks)
+            {
+                Console.WriteLine($"{book.Title} - {book.Author}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("Книги не найдены.");
+        }
+    }
+
+    public void ShowAllBooks()
+    {
+        if (books.Any())
+        {
+            Console.WriteLine("Список всех книг:");
+            foreach (var book in books)
+            {
+                Console.WriteLine($"{book.Title} - {book.Author}");
+            }
+        }
+        else
+        {
+            Console.WriteLine("В библиотеке нет книг.");
+        }
+    }
+}
+
+class Book
+{
+    public string Title { get; set; }
+    public string Author { get; set; }
+}

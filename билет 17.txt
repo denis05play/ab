@@ -1,0 +1,89 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем кэш с временем жизни данных 5 секунд
+        var cache = new Cache(TimeSpan.FromSeconds(5));
+
+        // Добавляем данные в кэш
+        cache.Add("key1", "Значение 1");
+        cache.Add("key2", "Значение 2");
+
+        // Получаем данные из кэша
+        Console.WriteLine($"key1: {cache.Get("key1")}");
+        Console.WriteLine($"key2: {cache.Get("key2")}");
+
+        // Ждем 6 секунд (время жизни данных истекает)
+        Console.WriteLine("\nОжидаем 6 секунд...");
+        System.Threading.Thread.Sleep(6000);
+
+        // Пытаемся получить данные из кэша после истечения времени жизни
+        Console.WriteLine($"key1: {cache.Get("key1")}");
+        Console.WriteLine($"key2: {cache.Get("key2")}");
+
+        // Удаляем данные из кэша
+        cache.Remove("key1");
+        Console.WriteLine($"\nkey1 после удаления: {cache.Get("key1")}");
+    }
+}
+
+// Класс для кэширования данных
+class Cache
+{
+    // Словарь для хранения данных
+    private readonly Dictionary<string, CacheItem> _cache = new Dictionary<string, CacheItem>();
+
+    // Время жизни данных в кэше
+    private readonly TimeSpan _lifetime;
+
+    // Конструктор
+    public Cache(TimeSpan lifetime)
+    {
+        _lifetime = lifetime;
+    }
+
+    // Метод для добавления данных в кэш
+    public void Add(string key, object value)
+    {
+        _cache[key] = new CacheItem
+        {
+            Value = value,
+            ExpirationTime = DateTime.UtcNow + _lifetime
+        };
+    }
+
+    // Метод для получения данных из кэша
+    public object Get(string key)
+    {
+        if (_cache.TryGetValue(key, out CacheItem item))
+        {
+            // Проверяем, не истекло ли время жизни данных
+            if (DateTime.UtcNow <= item.ExpirationTime)
+            {
+                return item.Value;
+            }
+            else
+            {
+                // Удаляем данные, если время жизни истекло
+                _cache.Remove(key);
+            }
+        }
+        return null; // Данные не найдены или истекли
+    }
+
+    // Метод для удаления данных из кэша
+    public void Remove(string key)
+    {
+        _cache.Remove(key);
+    }
+
+    // Вложенный класс для хранения данных и времени их жизни
+    private class CacheItem
+    {
+        public object Value { get; set; }         // Значение
+        public DateTime ExpirationTime { get; set; } // Время истечения срока действия
+    }
+}

@@ -1,0 +1,90 @@
+using System;
+using System.Net.Http;
+using System.IO;
+using System.Threading.Tasks;
+
+class Program
+{
+    static async Task Main(string[] args)
+    {
+        // Список URL-адресов файлов для скачивания
+        string[] fileUrls = {
+            "https://example.com/file1.zip",
+            "https://example.com/file2.zip",
+            "https://example.com/file3.zip"
+        };
+
+        // Папка для сохранения загруженных файлов
+        string downloadFolder = "Downloads";
+
+        // Создаем папку, если она не существует
+        if (!Directory.Exists(downloadFolder))
+        {
+            Directory.CreateDirectory(downloadFolder);
+        }
+
+        // Асинхронно скачиваем каждый файл
+        foreach (var url in fileUrls)
+        {
+            try
+            {
+                Console.WriteLine($"Начало загрузки: {url}");
+                await DownloadFileAsync(url, downloadFolder);
+                Console.WriteLine($"Загрузка завершена: {url}\n");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка при загрузке {url}: {ex.Message}");
+            }
+        }
+
+        Console.WriteLine("Все файлы загружены.");
+    }
+
+    // Асинхронный метод для скачивания файла
+    static async Task DownloadFileAsync(string url, string downloadFolder)
+    {
+        using (HttpClient client = new HttpClient())
+        {
+            // Отправляем запрос на получение файла
+            HttpResponseMessage response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            response.EnsureSuccessStatusCode(); // Проверяем успешность запроса
+
+            // Получаем имя файла из URL
+            string fileName = Path.GetFileName(url);
+            string filePath = Path.Combine(downloadFolder, fileName);
+
+            // Получаем общий размер файла
+            long? totalBytes = response.Content.Headers.ContentLength;
+
+            // Создаем поток для записи файла
+            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            using (var contentStream = await response.Content.ReadAsStreamAsync())
+            {
+                await ProcessContentStreamAsync(contentStream, fileStream, totalBytes);
+            }
+        }
+    }
+
+    // Асинхронный метод для обработки потока данных и вывода прогресса
+    static async Task ProcessContentStreamAsync(Stream contentStream, Stream fileStream, long? totalBytes)
+    {
+        var buffer = new byte[8192]; // Буфер для чтения данных
+        int bytesRead;
+        long totalBytesRead = 0;
+
+        // Читаем данные из потока и записываем в файл
+        while ((bytesRead = await contentStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+        {
+            await fileStream.WriteAsync(buffer, 0, bytesRead);
+            totalBytesRead += bytesRead;
+
+            // Выводим прогресс загрузки
+            if (totalBytes.HasValue)
+            {
+                double progress = (double)totalBytesRead / totalBytes.Value * 100;
+                Console.WriteLine($"Прогресс: {progress:F2}%");
+            }
+        }
+    }
+}

@@ -1,0 +1,66 @@
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        while (true)
+        {
+            try
+            {
+                // Запрос первого числа
+                Console.Write("Введите первое число: ");
+                double num1 = GetNumberFromUser();
+
+                // Запрос второго числа
+                Console.Write("Введите второе число: ");
+                double num2 = GetNumberFromUser();
+
+                // Выполнение деления
+                double result = DivideNumbers(num1, num2);
+
+                // Вывод результата
+                Console.WriteLine($"Результат деления: {result}");
+            }
+            catch (DivideByZeroException)
+            {
+                Console.WriteLine("Ошибка: Деление на ноль невозможно.");
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Ошибка: Введено некорректное число.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Произошла ошибка: {ex.Message}");
+            }
+
+            // Предложение продолжить или выйти
+            Console.Write("Хотите продолжить? (y/n): ");
+            string choice = Console.ReadLine();
+            if (choice.ToLower() != "y")
+                break; // Выход из цикла, если пользователь не хочет продолжать
+        }
+    }
+
+    // Метод для получения числа от пользователя
+    static double GetNumberFromUser()
+    {
+        string input = Console.ReadLine();
+        if (!double.TryParse(input, out double number))
+        {
+            throw new FormatException();
+        }
+        return number;
+    }
+
+    // Метод для выполнения деления
+    static double DivideNumbers(double num1, double num2)
+    {
+        if (num2 == 0)
+        {
+            throw new DivideByZeroException();
+        }
+        return num1 / num2;
+    }
+}

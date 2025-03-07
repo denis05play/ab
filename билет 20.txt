@@ -1,0 +1,105 @@
+using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Словарь для хранения зарегистрированных пользователей
+        var users = new Dictionary<string, string>();
+
+        while (true)
+        {
+            Console.WriteLine("1. Регистрация");
+            Console.WriteLine("2. Вход");
+            Console.WriteLine("3. Выход");
+            Console.Write("Выберите действие: ");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1":
+                    RegisterUser(users);
+                    break;
+                case "2":
+                    LoginUser(users);
+                    break;
+                case "3":
+                    return;
+                default:
+                    Console.WriteLine("Неверный выбор. Попробуйте снова.");
+                    break;
+            }
+        }
+    }
+
+    // Метод для регистрации пользователя
+    static void RegisterUser(Dictionary<string, string> users)
+    {
+        Console.Write("Введите имя пользователя: ");
+        string username = Console.ReadLine();
+
+        if (users.ContainsKey(username))
+        {
+            Console.WriteLine("Пользователь с таким именем уже существует.");
+            return;
+        }
+
+        Console.Write("Введите пароль: ");
+        string password = Console.ReadLine();
+
+        // Хэшируем пароль
+        string hashedPassword = HashPassword(password);
+
+        // Сохраняем пользователя
+        users[username] = hashedPassword;
+        Console.WriteLine("Пользователь успешно зарегистрирован.");
+    }
+
+    // Метод для входа пользователя
+    static void LoginUser(Dictionary<string, string> users)
+    {
+        Console.Write("Введите имя пользователя: ");
+        string username = Console.ReadLine();
+
+        if (!users.ContainsKey(username))
+        {
+            Console.WriteLine("Пользователь не найден.");
+            return;
+        }
+
+        Console.Write("Введите пароль: ");
+        string password = Console.ReadLine();
+
+        // Хэшируем введенный пароль и сравниваем с сохраненным
+        string hashedPassword = HashPassword(password);
+        if (users[username] == hashedPassword)
+        {
+            Console.WriteLine("Вход выполнен успешно.");
+        }
+        else
+        {
+            Console.WriteLine("Неверный пароль.");
+        }
+    }
+
+    // Метод для хэширования пароля
+    static string HashPassword(string password)
+    {
+        using (var sha256 = SHA256.Create())
+        {
+            // Преобразуем пароль в байтовый массив
+            byte[] bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
+
+            // Преобразуем байтовый массив в строку в шестнадцатеричном формате
+            var builder = new StringBuilder();
+            foreach (byte b in bytes)
+            {
+                builder.Append(b.ToString("x2"));
+            }
+            return builder.ToString();
+        }
+    }
+}

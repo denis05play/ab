@@ -1,0 +1,49 @@
+using System;
+using System.Threading;
+
+class Program
+{
+    // Общий ресурс для хранения результата
+    private static long _result = 1;
+    private static readonly object _lock = new object(); // Объект для блокировки
+
+    static void Main(string[] args)
+    {
+        // Число, для которого вычисляется факториал
+        int number = 5;
+
+        // Создаем и запускаем потоки
+        Thread[] threads = new Thread[number];
+        for (int i = 1; i <= number; i++)
+        {
+            int currentNumber = i; // Локальная переменная для каждого потока
+            threads[i - 1] = new Thread(() => ComputeFactorial(currentNumber));
+            threads[i - 1].Start();
+        }
+
+        // Ожидаем завершения всех потоков
+        foreach (var thread in threads)
+        {
+            thread.Join();
+        }
+
+        // Выводим результат
+        Console.WriteLine($"Факториал числа {number} равен {_result}");
+    }
+
+    // Метод для вычисления факториала
+    static void ComputeFactorial(int n)
+    {
+        long partialResult = 1;
+        for (int i = 1; i <= n; i++)
+        {
+            partialResult *= i;
+        }
+
+        // Используем блокировку для обновления общего ресурса
+        lock (_lock)
+        {
+            _result *= partialResult;
+        }
+    }
+}

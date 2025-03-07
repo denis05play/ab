@@ -1,0 +1,56 @@
+using System;
+using System.IO;
+using System.Text.Json;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Путь к JSON-файлу
+        string inputFilePath = "data.json";
+        string outputFilePath = "output.json";
+
+        // Проверяем, существует ли файл
+        if (!File.Exists(inputFilePath))
+        {
+            Console.WriteLine($"Файл {inputFilePath} не найден.");
+            return;
+        }
+
+        try
+        {
+            // Чтение JSON-файла
+            string jsonData = File.ReadAllText(inputFilePath);
+
+            // Десериализация JSON в объекты C#
+            var people = JsonSerializer.Deserialize<List<Person>>(jsonData);
+
+            // Вывод данных на экран
+            Console.WriteLine("Загруженные данные:");
+            foreach (var person in people)
+            {
+                Console.WriteLine($"Имя: {person.Name}, Возраст: {person.Age}, Город: {person.City}");
+            }
+
+            // Сериализация объектов обратно в JSON
+            string updatedJsonData = JsonSerializer.Serialize(people, new JsonSerializerOptions { WriteIndented = true });
+
+            // Сохранение JSON в новый файл
+            File.WriteAllText(outputFilePath, updatedJsonData);
+            Console.WriteLine($"\nДанные сохранены в файл: {outputFilePath}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ошибка: {ex.Message}");
+        }
+    }
+}
+
+// Класс, представляющий объект Person
+class Person
+{
+    public string Name { get; set; } // Имя
+    public int Age { get; set; }     // Возраст
+    public string City { get; set; } // Город
+}

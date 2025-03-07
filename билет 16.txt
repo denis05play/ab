@@ -1,0 +1,68 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем список продаж
+        var sales = new List<Sale>
+        {
+            new Sale { ProductName = "Ноутбук", Quantity = 5, Price = 50000 },
+            new Sale { ProductName = "Смартфон", Quantity = 10, Price = 30000 },
+            new Sale { ProductName = "Планшет", Quantity = 3, Price = 25000 }
+        };
+
+        // Создаем отчет
+        var reportGenerator = new SalesReportGenerator();
+        string report = reportGenerator.GenerateReport(sales);
+
+        // Сохраняем отчет в файл
+        string reportFilePath = "sales_report.txt";
+        File.WriteAllText(reportFilePath, report);
+
+        Console.WriteLine($"Отчет сохранен в файл: {reportFilePath}");
+        Console.WriteLine("\nСодержимое отчета:");
+        Console.WriteLine(report);
+    }
+}
+
+// Класс, представляющий продажу
+class Sale
+{
+    public string ProductName { get; set; } // Название товара
+    public int Quantity { get; set; }       // Количество
+    public decimal Price { get; set; }      // Цена за единицу
+}
+
+// Класс для генерации отчетов о продажах
+class SalesReportGenerator
+{
+    // Метод для генерации отчета
+    public string GenerateReport(List<Sale> sales)
+    {
+        // Шаблон для строки отчета
+        string reportTemplate = "{0,-20} {1,10} {2,15} {3,15}\n";
+        string report = string.Format(reportTemplate, "Товар", "Количество", "Цена за ед.", "Итого");
+
+        // Добавляем разделительную линию
+        report += new string('-', 60) + "\n";
+
+        decimal totalRevenue = 0;
+
+        // Добавляем данные о продажах
+        foreach (var sale in sales)
+        {
+            decimal total = sale.Quantity * sale.Price;
+            totalRevenue += total;
+            report += string.Format(reportTemplate, sale.ProductName, sale.Quantity, sale.Price, total);
+        }
+
+        // Добавляем итоговую сумму
+        report += new string('-', 60) + "\n";
+        report += string.Format(reportTemplate, "Итого", "", "", totalRevenue);
+
+        return report;
+    }
+}

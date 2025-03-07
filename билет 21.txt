@@ -1,0 +1,66 @@
+using System;
+
+// Класс-издатель (сигналы)
+class Publisher
+{
+    // 1. Объявляем делегат для сигнала
+    public delegate void MessageHandler(string message);
+    
+    // 2. Создаем событие на основе делегата
+    public event MessageHandler OnMessagePublished;
+
+    // 3. Метод для отправки сигнала
+    public void Publish(string message)
+    {
+        Console.WriteLine($"Издатель отправляет: {message}");
+        OnMessagePublished?.Invoke(message);
+    }
+}
+
+// Класс-подписчик (слоты)
+class Subscriber
+{
+    private readonly string _name;
+
+    public Subscriber(string name)
+    {
+        _name = name;
+    }
+
+    // 4. Метод-слот для обработки сигнала
+    public void HandleMessage(string message)
+    {
+        Console.WriteLine($"{_name} получил: {message}");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        // Создаем объекты
+        var publisher = new Publisher();
+        var sub1 = new Subscriber("Подписчик 1");
+        var sub2 = new Subscriber("Подписчик 2");
+
+        // 5. Подписываемся на событие
+        publisher.OnMessagePublished += sub1.HandleMessage;
+        publisher.OnMessagePublished += sub2.HandleMessage;
+        publisher.OnMessagePublished += ShowMessage; // Подписка статического метода
+
+        // Отправляем сообщение
+        publisher.Publish("Первое сообщение!");
+
+        // 6. Отписываем одного подписчика
+        publisher.OnMessagePublished -= sub2.HandleMessage;
+
+        // Отправляем второе сообщение
+        publisher.Publish("Второе сообщение!");
+    }
+
+    // Дополнительный статический слот
+    static void ShowMessage(string msg)
+    {
+        Console.WriteLine($"Статический обработчик: {msg}");
+    }
+}

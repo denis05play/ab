@@ -1,0 +1,53 @@
+using System;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Получаем экземпляр конфигурации
+        var config = AppConfig.Instance;
+
+        // Устанавливаем настройки
+        config.SetSetting("Theme", "Dark");
+        config.SetSetting("Language", "Russian");
+
+        // Получаем настройки
+        Console.WriteLine($"Тема: {config.GetSetting("Theme")}");
+        Console.WriteLine($"Язык: {config.GetSetting("Language")}");
+
+        // Пытаемся создать еще один экземпляр (не получится)
+        var anotherConfig = AppConfig.Instance;
+        Console.WriteLine($"Тот же экземпляр? {config == anotherConfig}");
+    }
+}
+
+// Класс конфигурации приложения (Singleton)
+class AppConfig
+{
+    // Единственный экземпляр класса
+    private static readonly Lazy<AppConfig> _instance = new Lazy<AppConfig>(() => new AppConfig());
+
+    // Словарь для хранения настроек
+    private readonly System.Collections.Generic.Dictionary<string, string> _settings;
+
+    // Приватный конструктор (чтобы нельзя было создать экземпляр извне)
+    private AppConfig()
+    {
+        _settings = new System.Collections.Generic.Dictionary<string, string>();
+    }
+
+    // Статическое свойство для доступа к экземпляру
+    public static AppConfig Instance => _instance.Value;
+
+    // Метод для добавления или обновления настройки
+    public void SetSetting(string key, string value)
+    {
+        _settings[key] = value;
+    }
+
+    // Метод для получения настройки
+    public string GetSetting(string key)
+    {
+        return _settings.ContainsKey(key) ? _settings[key] : null;
+    }
+}

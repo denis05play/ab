@@ -1,0 +1,99 @@
+using System;
+using System.Collections.Generic;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем коллекцию уникальных строк
+        var uniqueCollection = new UniqueCollection<string>();
+
+        // Добавляем элементы
+        uniqueCollection.Add("Apple");
+        uniqueCollection.Add("Banana");
+        uniqueCollection.Add("Cherry");
+
+        // Пытаемся добавить дубликат
+        uniqueCollection.Add("Apple"); // Не будет добавлено
+
+        // Выводим элементы коллекции
+        Console.WriteLine("Элементы коллекции:");
+        foreach (var item in uniqueCollection)
+        {
+            Console.WriteLine(item);
+        }
+
+        // Поиск элемента
+        Console.WriteLine("\nПоиск элемента 'Banana':");
+        if (uniqueCollection.Contains("Banana"))
+        {
+            Console.WriteLine("Элемент найден.");
+        }
+        else
+        {
+            Console.WriteLine("Элемент не найден.");
+        }
+
+        // Удаление элемента
+        Console.WriteLine("\nУдаляем элемент 'Banana':");
+        uniqueCollection.Remove("Banana");
+
+        // Выводим элементы коллекции после удаления
+        Console.WriteLine("\nЭлементы коллекции после удаления:");
+        foreach (var item in uniqueCollection)
+        {
+            Console.WriteLine(item);
+        }
+    }
+}
+
+// Класс-коллекция для хранения уникальных элементов
+class UniqueCollection<T> : IEnumerable<T>
+{
+    // Внутренний набор для хранения уникальных элементов
+    private readonly HashSet<T> _items = new HashSet<T>();
+
+    // Метод для добавления элемента
+    public void Add(T item)
+    {
+        if (_items.Add(item))
+        {
+            Console.WriteLine($"Элемент '{item}' добавлен.");
+        }
+        else
+        {
+            Console.WriteLine($"Элемент '{item}' уже существует и не был добавлен.");
+        }
+    }
+
+    // Метод для удаления элемента
+    public void Remove(T item)
+    {
+        if (_items.Remove(item))
+        {
+            Console.WriteLine($"Элемент '{item}' удален.");
+        }
+        else
+        {
+            Console.WriteLine($"Элемент '{item}' не найден.");
+        }
+    }
+
+    // Метод для поиска элемента
+    public bool Contains(T item)
+    {
+        return _items.Contains(item);
+    }
+
+    // Реализация интерфейса IEnumerable для поддержки foreach
+    public IEnumerator<T> GetEnumerator()
+    {
+        return _items.GetEnumerator();
+    }
+
+    // Явная реализация интерфейса IEnumerable (необобщенный)
+    System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+}

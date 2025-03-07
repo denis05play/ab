@@ -1,0 +1,69 @@
+using System;
+using System.Text.RegularExpressions;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        // Создаем экземпляр валидатора
+        var validator = new InputValidator();
+
+        // Примеры данных для валидации
+        string email = "test@example.com";
+        string phone = "+7 (123) 456-78-90";
+
+        // Проверка email
+        if (validator.ValidateEmail(email))
+        {
+            Console.WriteLine($"Email '{email}' корректен.");
+        }
+        else
+        {
+            Console.WriteLine($"Email '{email}' некорректен.");
+        }
+
+        // Проверка номера телефона
+        if (validator.ValidatePhone(phone))
+        {
+            Console.WriteLine($"Номер телефона '{phone}' корректен.");
+        }
+        else
+        {
+            Console.WriteLine($"Номер телефона '{phone}' некорректен.");
+        }
+    }
+}
+
+// Класс для валидации пользовательского ввода
+class InputValidator
+{
+    // Регулярное выражение для проверки email
+    private static readonly Regex EmailRegex = new Regex(
+        @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+        RegexOptions.Compiled
+    );
+
+    // Регулярное выражение для проверки номера телефона
+    private static readonly Regex PhoneRegex = new Regex(
+        @"^\+7\s?\(?\d{3}\)?\s?\d{3}-?\d{2}-?\d{2}$",
+        RegexOptions.Compiled
+    );
+
+    // Метод для проверки email
+    public bool ValidateEmail(string email)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+            return false;
+
+        return EmailRegex.IsMatch(email);
+    }
+
+    // Метод для проверки номера телефона
+    public bool ValidatePhone(string phone)
+    {
+        if (string.IsNullOrWhiteSpace(phone))
+            return false;
+
+        return PhoneRegex.IsMatch(phone);
+    }
+}
